@@ -1781,6 +1781,8 @@ function initTranslator() {
         if (!srcTextArea.value.trim()) {
             tgtTextDiv.textContent = "번역 결과가 여기에 표시됩니다...";
             tgtTextDiv.classList.add("placeholder-active");
+            document.getElementById("translator-alt-translations").style.display = "none";
+            document.getElementById("translator-dict-details").style.display = "none";
             return;
         }
         
@@ -1835,6 +1837,8 @@ function initTranslator() {
         tgtTextDiv.textContent = "번역 결과가 여기에 표시됩니다...";
         tgtTextDiv.classList.add("placeholder-active");
         charCountSpan.textContent = "0 / 1000";
+        document.getElementById("translator-alt-translations").style.display = "none";
+        document.getElementById("translator-dict-details").style.display = "none";
         window.speechSynthesis.cancel();
     });
 
@@ -1917,7 +1921,14 @@ function initTranslator() {
 async function performTranslation() {
     const text = document.getElementById("src-text").value.trim();
     const tgtTextDiv = document.getElementById("tgt-text");
-    if (!text) return;
+    const altContainer = document.getElementById("translator-alt-translations");
+    const dictDetailsDiv = document.getElementById("translator-dict-details");
+    
+    if (!text) {
+        altContainer.style.display = "none";
+        dictDetailsDiv.style.display = "none";
+        return;
+    }
     
     tgtTextDiv.textContent = "번역 중...";
     tgtTextDiv.classList.add("placeholder-active");
@@ -1931,16 +1942,145 @@ async function performTranslation() {
                 let result = data.responseData.translatedText;
                 if (result && result.toLowerCase().includes("mymemory")) {
                     tgtTextDiv.textContent = "번역 실패 (API 한도 초과 또는 오류)";
+                    altContainer.style.display = "none";
+                    dictDetailsDiv.style.display = "none";
                 } else {
                     tgtTextDiv.textContent = result;
                     tgtTextDiv.classList.remove("placeholder-active");
+                    
+                    // Show alternative translation choices
+                    showAlternativeTranslations(data.matches, result);
+                    
+                    // Show dictionary definitions and example sentences if it's a single word
+                    fetchDictionaryAlternatives(text);
                 }
             }
         } else {
             tgtTextDiv.textContent = "번역 실패 (서버 연결 오류)";
+            altContainer.style.display = "none";
+            dictDetailsDiv.style.display = "none";
         }
     } catch (err) {
         console.error("Translation error:", err);
         tgtTextDiv.textContent = "번역 오류가 발생했습니다.";
+        altContainer.style.display = "none";
+        dictDetailsDiv.style.display = "none";
+    }
+}
+
+function showAlternativeTranslations(matches, primaryTranslation) {
+    const altContainer = document.getElementById("translator-alt-translations");
+    altContainer.style.display = "none";
+    altContainer.innerHTML = "";
+    
+    if (!matches || matches.length <= 1) return;
+    
+    const srcText = document.getElementById("src-text").value.trim().toLowerCase();
+    
+    // Find unique translations
+    const uniqueAlts = new Set();
+    matches.forEach(m => {
+        const altText = m.translation.trim();
+        if (altText && 
+            altText.toLowerCase() !== primaryTranslation.toLowerCase() && 
+            altText.toLowerCase() !== srcText) {
+            uniqueAlts.add(altText);
+        }
+    });
+    
+    if (uniqueAlts.size > 0) {
+        let html = `<div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.85;">`;
+        html += `<strong style="font-size: 0.85rem; color: var(--color-accent);">유사한 다른 번역 표현:</strong>`;
+        html += `<ul style="margin-top: 0.25rem; padding-left: 1.25rem; margin-bottom: 0;">`;
+        Array.from(uniqueAlts).slice(0, 3).forEach(alt => {
+            html += `<li>${escapeHTML(alt)}</li>`;
+        });
+        html += `</ul></div>`;
+        
+        altContainer.innerHTML = html;
+        altContainer.style.display = "block";
+    }
+}
+
+async function fetchDictionaryAlternatives(word) {
+    const dictDetailsDiv = document.getElementById("translator-dict-details");
+    dictDetailsDiv.style.display = "none";
+    dictDetailsDiv.innerHTML = "";
+    
+    // Clean word
+    const cleanWord = word.trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"");
+    // If it has spaces or is not English source, don't show dictionary details
+    if (cleanWord.includes(" ") || cleanWord.length === 0 || translatorSourceLang !== "en") return;
+    
+    try {
+        const dictUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(cleanWord)}`;
+        const dictRes = await fetch(dictUrl);
+        if (!dictRes.ok) return;
+        
+        const data = await dictRes.json();
+        if (!data || data.length === 0) return;
+        
+        const entry = data[0];
+        let html = `<h4 style="margin-top: 0.5rem; font-size: 0.95rem; color: var(--color-accent); border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">📚 사전 정의 및 예문 (Dictionary Info)</h4>`;
+        
+        // Let's gather the top definitions (up to 3)
+        let count = 0;
+        if (entry.meanings) {
+            for (const m of entry.meanings) {
+                const partOfSpeech = m.partOfSpeech; // e.g. noun, verb
+                if (m.definitions) {
+                    for (const d of m.definitions) {
+                        if (count >= 3) break;
+                        
+                        const defEn = d.definition;
+                        const exEn = d.example || "";
+                        
+                        // Translate definition
+                        let defKo = "";
+                        try {
+                            const transDefRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(defEn)}&langpair=en|ko`);
+                            if (transDefRes.ok) {
+                                const transDefData = await transDefRes.json();
+                                defKo = transDefData.responseData.translatedText;
+                                if (defKo && defKo.toLowerCase().includes("mymemory")) defKo = "";
+                            }
+                        } catch (e) { console.warn(e); }
+                        
+                        // Translate example
+                        let exKo = "";
+                        if (exEn) {
+                            try {
+                                const transExRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(exEn)}&langpair=en|ko`);
+                                if (transExRes.ok) {
+                                    const transExData = await transExRes.json();
+                                    exKo = transExData.responseData.translatedText;
+                                    if (exKo && exKo.toLowerCase().includes("mymemory")) exKo = "";
+                                }
+                            } catch (e) { console.warn(e); }
+                        }
+                        
+                        html += `
+                            <div class="dict-def-item" style="margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.5;">
+                                <strong style="color: var(--color-accent); text-transform: uppercase; font-size: 0.8rem;">[${partOfSpeech}]</strong> 
+                                <span style="font-weight: 600;">${escapeHTML(defKo || defEn)}</span>
+                                <div style="font-size: 0.85rem; opacity: 0.7; margin-left: 0.5rem; border-left: 2px solid var(--border-color); padding-left: 0.5rem; margin-top: 0.25rem;">
+                                    <div>Def (EN): <em>${escapeHTML(defEn)}</em></div>
+                                    ${exEn ? `<div style="margin-top: 0.15rem; font-weight: 500;">Ex: "${escapeHTML(exEn)}" ${exKo ? `➔ ${escapeHTML(exKo)}` : ''}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                        count++;
+                    }
+                }
+                if (count >= 3) break;
+            }
+        }
+        
+        if (count > 0) {
+            dictDetailsDiv.innerHTML = html;
+            dictDetailsDiv.style.display = "block";
+        }
+    } catch (err) {
+        console.warn("Error fetching dictionary alternatives:", err);
     }
 }
