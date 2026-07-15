@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Preply Flow - 영어 학습 동반자</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area link-to-view" data-target="dashboard" style="cursor: pointer;" title="대시보드로 이동">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 7V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="logo-text">My Preply <span class="logo-highlight">Flow</span></span>
+            </div>
+            
+            <nav class="nav-links">
+                <button class="nav-btn" data-target="add-word">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <div class="nav-btn-label">
+                        <div class="nav-en">Add Vocab</div>
+                        <div class="nav-ko">단어 등록</div>
+                    </div>
+                </button>
+                <button class="nav-btn" data-target="news">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 4v10a2 2 0 0 1-2 2h-2"></path><polyline points="10 11 14 11 14 15"></polyline><line x1="10" y1="15" x2="14" y2="15"></line></svg>
+                    <div class="nav-btn-label">
+                        <div class="nav-en">Daily News</div>
+                        <div class="nav-ko">오늘의 뉴스</div>
+                    </div>
+                </button>
+                <button class="nav-btn" data-target="typing">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line><line x1="6" y1="12" x2="6.01" y2="12"></line><line x1="10" y1="12" x2="14.01" y2="12"></line><line x1="18" y1="12" x2="18.01" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+                    <div class="nav-btn-label">
+                        <div class="nav-en">Typing Practice</div>
+                        <div class="nav-ko">타이핑 암기</div>
+                    </div>
+                </button>
+                <button class="nav-btn" data-target="library">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    <div class="nav-btn-label">
+                        <div class="nav-en">Word Library</div>
+                        <div class="nav-ko">내 단어장</div>
+                    </div>
+                </button>
+                <button class="nav-btn" data-target="flashcards">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+                    <div class="nav-btn-label">
+                        <div class="nav-en">Flashcards</div>
+                        <div class="nav-ko">플래시카드</div>
+                    </div>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="테마 전환">
+                    <span class="icon-light">☀️ 라이트 모드</span>
+                    <span class="icon-dark">🌙 다크 모드</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 id="page-title">학습 대시보드</h1>
+                    <p id="page-subtitle" class="text-secondary">오늘 새로 배운 표현을 정리하고 복습해 보세요.</p>
+                </div>
+                
+                <div class="header-right">
+                    <!-- Streak Widget -->
+                    <div class="streak-widget" title="매일 단어를 저장하거나 학습하여 학습 스트릭을 유지하세요!">
+                        <div class="streak-fire">🔥</div>
+                        <div class="streak-info">
+                            <span class="streak-count" id="streak-days">0</span>일 연속
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Views Containers -->
+            <div class="view-viewport">
+                
+                <!-- 1. DASHBOARD VIEW -->
+                <section id="view-dashboard" class="view-pane active">
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon vocab-count-icon">📚</div>
+                            <div class="stat-details">
+                                <span class="stat-label">누적 단어 수</span>
+                                <h3 class="stat-value" id="stat-total-words">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon news-read-icon">📰</div>
+                            <div class="stat-details">
+                                <span class="stat-label">읽은 뉴스 수</span>
+                                <h3 class="stat-value" id="stat-read-news">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon mastered-icon">✅</div>
+                            <div class="stat-details">
+                                <span class="stat-label">암기 완료 단어</span>
+                                <h3 class="stat-value" id="stat-mastered-words">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon progress-icon">🎯</div>
+                            <div class="stat-details">
+                                <span class="stat-label">오늘의 목표 달성</span>
+                                <div class="progress-container">
+                                    <div class="progress-bar" id="today-goal-bar" style="width: 0%"></div>
+                                </div>
+                                <span class="progress-text" id="today-goal-text">0 / 5 단어 등록</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Columns -->
+                    <div class="dashboard-columns">
+                        <!-- Left: Quick logger and statistics -->
+                        <div class="dash-column-main">
+                            <div class="content-card">
+                                <div class="card-header">
+                                    <h2>최근 추가한 단어/표현</h2>
+                                    <button class="card-action-btn link-to-view" data-target="library">전체 보기 →</button>
+                                </div>
+                                <div class="recent-list-container" id="recent-words-list">
+                                    <!-- Dynamic list of recent words -->
+                                    <div class="empty-state">
+                                        <div class="empty-icon">📝</div>
+                                        <p>아직 등록된 단어가 없습니다.<br>수업에서 배운 표현을 추가해 보세요!</p>
+                                        <button class="btn btn-primary link-to-view" data-target="add-word">첫 단어 등록하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Daily news preview & Study encouragement -->
+                        <div class="dash-column-side">
+                            <!-- News Preview Card -->
+                            <div class="content-card news-preview-card">
+                                <div class="card-tag">TODAY'S ARTICLE</div>
+                                <h2 id="dash-news-title">오늘의 뉴스 미리보기</h2>
+                                <p id="dash-news-excerpt" class="text-secondary">기사를 읽고 핵심 표현을 단어장에 즉시 추가해 보세요...</p>
+                                <button class="btn btn-secondary w-100 link-to-view" data-target="news" style="margin-top: 1rem;">뉴스 읽으러 가기</button>
+                            </div>
+
+                            <!-- Study widgets -->
+                            <div class="content-card study-widget-card">
+                                <h2>오늘의 추천 복습</h2>
+                                <p class="text-secondary" style="margin-bottom: 1rem;">다양한 복습 모드로 기억력을 극대화하세요.</p>
+                                <div class="study-options">
+                                    <button class="study-option-item link-to-view" data-target="typing">
+                                        <div class="option-icon">⌨️</div>
+                                        <div class="option-info">
+                                            <strong>타이핑 단어 암기</strong>
+                                            <span>키보드로 직접 써보며 학습</span>
+                                        </div>
+                                    </button>
+                                    <button class="study-option-item link-to-view" data-target="flashcards">
+                                        <div class="option-icon">🃏</div>
+                                        <div class="option-info">
+                                            <strong>액티브 리콜 플래시카드</strong>
+                                            <span>3D 카드로 빠른 단어 테스트</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. ADD WORD VIEW -->
+                <section id="view-add-word" class="view-pane">
+                    <div class="form-layout">
+                        <div class="content-card">
+                            <h2>새 단어 / 표현 등록</h2>
+                            <p class="text-secondary" style="margin-bottom: 1.5rem;">Preply 수업 시간이나 영어 공부 중에 알게 된 단어와 뉘앙스를 세부적으로 기록하세요.</p>
+                            
+                            <form id="vocab-form" autocomplete="off">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="vocab-word">단어 / 표현 <span class="required">*</span></label>
+                                        <div class="input-with-button">
+                                            <input type="text" id="vocab-word" placeholder="예: cognitive, pull strings" required>
+                                            <button type="button" class="btn btn-primary" id="btn-auto-search">🔍 자동 완성</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="vocab-meaning">뜻 (한국어) <span class="required">*</span></label>
+                                        <input type="text" id="vocab-meaning" placeholder="예: 인지적인, 배후에서 조종하다" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="vocab-example">예문 (영어)</label>
+                                    <textarea id="vocab-example" rows="3" placeholder="예: Sleep deprivation can affect your cognitive functions."></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="vocab-example-translation">예문 해석</label>
+                                    <textarea id="vocab-example-translation" rows="2" placeholder="예: 수면 부족은 인지 기능에 영향을 미칠 수 있다."></textarea>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="vocab-context">학습 맥락 / 튜터</label>
+                                        <input type="text" id="vocab-context" placeholder="예: Tutor David 수업 중, NYT 기사에서">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="vocab-pronunciation">한글 발음 / 강세 메모</label>
+                                        <input type="text" id="vocab-pronunciation" placeholder="예: [카그너티브] o에 강세">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="vocab-phonetic">사전 영어 발음 기호 (IPA)</label>
+                                    <input type="text" id="vocab-phonetic" placeholder="예: /ˈkɑːɡ.nɪ.tɪv/">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>태그 선택</label>
+                                    <div class="tag-selector" id="vocab-tags-container">
+                                        <!-- Tags will be dynamically generated and selected -->
+                                        <span class="tag-pill" data-value="Idiom">이디엄</span>
+                                        <span class="tag-pill" data-value="Business">비즈니스</span>
+                                        <span class="tag-pill" data-value="Casual">일상회화</span>
+                                        <span class="tag-pill" data-value="Grammar">문법</span>
+                                        <span class="tag-pill" data-value="Pronunciation">발음</span>
+                                        <span class="tag-pill" data-value="Academic">학술</span>
+                                        <span class="tag-pill" data-value="Other">기타</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="reset" class="btn btn-secondary">초기화</button>
+                                    <button type="submit" class="btn btn-primary">단어 저장하기</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. DAILY NEWS VIEW -->
+                <section id="view-news" class="view-pane">
+                    <div class="news-layout">
+                        <!-- News Header & Navigation -->
+                        <div class="news-selector-header">
+                            <div class="news-list-tabs" id="news-tabs-container">
+                                <!-- Tabs will be inserted by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Current Article Card -->
+                        <div class="content-card news-article-card" id="news-content-card">
+                            <div class="news-meta">
+                                <span class="news-date" id="news-date">2026-07-15</span>
+                                <span class="news-category" id="news-category">Technology</span>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="btn-tts" id="news-play-tts" title="오디오 듣기">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                        기사 듣기
+                                    </button>
+                                    <a class="btn-tts" id="news-source-link" href="https://learningenglish.voanews.com/" target="_blank" rel="noopener noreferrer" title="원본 기사 사이트로 이동" style="text-decoration: none; align-items: center; justify-content: center; display: inline-flex;">
+                                        🔗 원본 이동
+                                    </a>
+                                </div>
+                            </div>
+
+                            <h2 class="news-title-text" id="news-title">AI Technology Breakthrough in Language Learning</h2>
+                            
+                            <!-- Article body -->
+                            <div class="news-body-container">
+                                <div class="article-original" id="news-body-en">
+                                    <!-- Interactive English sentence will go here with clickable vocab words -->
+                                </div>
+
+                                <div class="article-translation-wrapper" id="news-translation-wrapper">
+                                    <button class="btn btn-toggle-trans" id="toggle-translation-btn">번역본 보기</button>
+                                    <div class="article-translation" id="news-body-ko" style="display: none;">
+                                        <!-- Korean translation -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- News explanation / instructions -->
+                            <div class="news-tip-banner">
+                                <span class="tip-icon">💡</span>
+                                <p><strong>단어 빠른 저장 팁:</strong> 영문 텍스트 내에 <span class="clickable-word-demo">초록색 테두리로 표시된 핵심 단어</span>를 클릭하면 바로 개인 단어장으로 추가할 수 있습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. TYPING STUDY VIEW -->
+                <section id="view-typing" class="view-pane">
+                    <div class="typing-study-layout">
+                        <!-- Mode selector when no words or configuring -->
+                        <div class="content-card typing-setup-card" id="typing-setup-view">
+                            <h2>타이핑 단어 암기 설정</h2>
+                            <p class="text-secondary" style="margin-bottom: 1.5rem;">기록한 단어장을 바탕으로 스펠링을 입력하며 암기 상태를 점검합니다.</p>
+                            
+                            <div class="setup-options">
+                                <div class="setup-group">
+                                    <label>학습 범위</label>
+                                    <select id="typing-range-select">
+                                        <option value="all">전체 단어</option>
+                                        <option value="recent">최근 10개 단어</option>
+                                        <option value="review">다시 복습이 필요한 단어</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="typing-start-actions">
+                                <button class="btn btn-primary" id="start-typing-btn">학습 시작</button>
+                            </div>
+                        </div>
+
+                        <!-- Typing Interface Screen -->
+                        <div class="typing-interface-card" id="typing-play-view" style="display: none;">
+                            <div class="typing-header">
+                                <div class="typing-progress-info">
+                                    <span>진행도: </span><span id="typing-progress-text">1 / 10</span>
+                                    <div class="mini-progress">
+                                        <div class="mini-progress-bar" id="typing-progress-bar" style="width: 10%"></div>
+                                    </div>
+                                </div>
+                                <div class="typing-stats-panel">
+                                    <span>정확도: <strong id="typing-accuracy-live">100%</strong></span>
+                                </div>
+                                <button class="btn-close-typing" id="exit-typing-btn" title="학습 중단">나가기</button>
+                            </div>
+
+                            <!-- Word Display and Input area -->
+                            <div class="typing-word-display-box">
+                                <span class="typing-word-meaning" id="typing-current-meaning">의미가 여기에 나옵니다.</span>
+                                
+                                <!-- Word spelling placeholder -->
+                                <div class="typing-word-visualizer" id="typing-word-visualizer">
+                                    <!-- Characters will be dynamically rendered here -->
+                                </div>
+                                
+                                <span class="typing-word-example" id="typing-current-example">예문이 여기에 출력됩니다.</span>
+                            </div>
+
+                            <!-- Secret Input -->
+                            <div class="typing-input-container">
+                                <input type="text" id="typing-hidden-input" autocomplete="off" autofocus placeholder="여기를 클릭하고 타이핑을 시작하세요">
+                                <div class="focus-alert-indicator" id="focus-alert">클릭하여 키보드 입력을 활성화하세요.</div>
+                            </div>
+
+                            <!-- Navigation / Skip -->
+                            <div class="typing-footer-actions">
+                                <button class="btn btn-secondary" id="typing-skip-btn">이 단어 건너뛰기</button>
+                                <button class="btn btn-tts-listen" id="typing-tts-btn">🔊 발음 듣기</button>
+                            </div>
+                        </div>
+
+                        <!-- Typing Result Screen -->
+                        <div class="content-card typing-result-card" id="typing-result-view" style="display: none;">
+                            <div class="result-badge">🏆 학습 완료!</div>
+                            <h2 style="margin-top: 1rem;">타이핑 암기 결과</h2>
+                            <p class="text-secondary" style="margin-bottom: 2rem;">완벽히 완수하셨습니다. 매일 연습하여 정확도를 높여보세요!</p>
+
+                            <div class="result-stats-grid">
+                                <div class="result-stat-box">
+                                    <span class="result-stat-label">총 단어</span>
+                                    <strong class="result-stat-value" id="result-total-count">10</strong>
+                                </div>
+                                <div class="result-stat-box">
+                                    <span class="result-stat-label">평균 정확도</span>
+                                    <strong class="result-stat-value" id="result-accuracy-value">95%</strong>
+                                </div>
+                                <div class="result-stat-box">
+                                    <span class="result-stat-label">스트릭 갱신</span>
+                                    <strong class="result-stat-value">🔥 Keep Going</strong>
+                                </div>
+                            </div>
+
+                            <div class="result-actions">
+                                <button class="btn btn-secondary link-to-view" data-target="dashboard">대시보드로 가기</button>
+                                <button class="btn btn-primary" id="restart-typing-btn">다시 학습하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. LIBRARY VIEW -->
+                <section id="view-library" class="view-pane">
+                    <div class="library-layout">
+                        <!-- Filters Dashboard -->
+                        <div class="content-card filter-card">
+                            <div class="filter-row-main">
+                                <div class="search-box">
+                                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                    <input type="text" id="library-search-input" placeholder="단어, 뜻, 예문 검색...">
+                                </div>
+                                <div class="sort-selector">
+                                    <label for="library-sort-select">정렬: </label>
+                                    <select id="library-sort-select">
+                                        <option value="newest">최근 등록순</option>
+                                        <option value="oldest">오래된 등록순</option>
+                                        <option value="alphabetical">알파벳순</option>
+                                        <option value="status">복습 필요순</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="filter-row-tags">
+                                <span class="filter-tag-label">태그 필터:</span>
+                                <div class="tag-filters-container" id="library-tag-filters">
+                                    <button class="filter-tag-pill active" data-tag="all">전체</button>
+                                    <!-- Dynamic tag pills will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Word Cards Grid -->
+                        <div class="word-cards-grid" id="library-words-grid">
+                            <!-- Dynamic word cards will be injected by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. FLASHCARDS VIEW -->
+                <section id="view-flashcards" class="view-pane">
+                    <div class="flashcards-layout">
+                        <!-- Setup Card if empty or starting -->
+                        <div class="content-card flashcard-setup-card" id="flashcard-setup-view">
+                            <h2>플래시카드 단어 암기</h2>
+                            <p class="text-secondary" style="margin-bottom: 1.5rem;">저장한 단어를 3D 플래시카드로 빠르게 학습하여 액티브 리콜 능력을 극대화합니다.</p>
+                            
+                            <div class="setup-options">
+                                <div class="setup-group">
+                                    <label>복습 카드 선택</label>
+                                    <select id="flashcard-range-select">
+                                        <option value="all">전체 단어</option>
+                                        <option value="review">복습이 필요한 단어만</option>
+                                        <option value="recent">최근 15개 단어</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flashcard-start-actions">
+                                <button class="btn btn-primary" id="start-flashcards-btn">학습 시작</button>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Flashcard Session -->
+                        <div class="flashcard-play-container" id="flashcard-play-view" style="display: none;">
+                            <div class="flashcard-session-header">
+                                <span class="session-progress" id="flashcard-progress-text">1 / 10 카드</span>
+                                <button class="btn-close-flashcard" id="exit-flashcard-btn">나가기</button>
+                            </div>
+
+                            <!-- 3D Card Container -->
+                            <div class="flashcard-stage">
+                                <div class="flashcard-3d" id="interactive-flashcard">
+                                    <!-- Card Front -->
+                                    <div class="card-face card-front">
+                                        <div class="card-tag" id="flash-card-tag">Tag</div>
+                                        <div class="card-main-word" id="flash-card-word">Word</div>
+                                        <div class="card-pronunciation" id="flash-card-pron">Pronunciation</div>
+                                        <div class="card-hint-text">💡 클릭하여 뒷면 확인</div>
+                                    </div>
+                                    <!-- Card Back -->
+                                    <div class="card-face card-back">
+                                        <div class="card-back-header">
+                                            <span class="card-back-tag" id="flash-card-tag-back">Tag</span>
+                                            <button class="btn-tts-speak" id="flash-card-tts-btn" title="발음 듣기">🔊</button>
+                                        </div>
+                                        <div class="card-meaning-text" id="flash-card-meaning">뜻</div>
+                                        <div class="card-example-box">
+                                            <p class="card-example-en" id="flash-card-ex-en">Example sentence</p>
+                                            <p class="card-example-ko" id="flash-card-ex-ko">Example translation</p>
+                                        </div>
+                                        <div class="card-context-note" id="flash-card-context">출처</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Response Buttons -->
+                            <div class="flashcard-controls">
+                                <button class="btn btn-secondary" id="flashcard-flip-btn">카드 뒤집기</button>
+                                <div class="feedback-btn-group" id="flashcard-rating-actions" style="display: none;">
+                                    <button class="btn btn-danger-glow" id="rating-hard-btn">
+                                        <span>다시 공부</span>
+                                        <small>틀렸거나 애매함</small>
+                                    </button>
+                                    <button class="btn btn-success-glow" id="rating-easy-btn">
+                                        <span>외웠음</span>
+                                        <small>기억 완료</small>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flashcard Finish Summary -->
+                        <div class="content-card flashcard-finish-card" id="flashcard-finish-view" style="display: none;">
+                            <div class="result-badge">🏆 세션 종료</div>
+                            <h2 style="margin-top: 1rem;">플래시카드 복습 완료</h2>
+                            <p class="text-secondary" style="margin-bottom: 2rem;">오늘의 복습 세션이 성공적으로 끝났습니다. 성과를 확인하세요.</p>
+
+                            <div class="result-stats-grid">
+                                <div class="result-stat-box">
+                                    <span class="result-stat-label">학습한 단어</span>
+                                    <strong class="result-stat-value" id="flashcard-result-total">10</strong>
+                                </div>
+                                <div class="result-stat-box">
+                                    <span class="result-stat-label">암기 완료 누적</span>
+                                    <strong class="result-stat-value" id="flashcard-result-mastered">5</strong>
+                                </div>
+                            </div>
+
+                            <div class="result-actions">
+                                <button class="btn btn-secondary link-to-view" data-target="dashboard">대시보드로 이동</button>
+                                <button class="btn btn-primary" id="restart-flashcards-btn">추가 학습하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: Edit Vocabulary Item -->
+    <div class="modal-backdrop" id="edit-vocab-modal" style="display: none;">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2>단어 정보 수정</h2>
+                <button class="btn-close-modal" id="close-edit-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-vocab-form">
+                    <input type="hidden" id="edit-vocab-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-vocab-word">단어 / 표현</label>
+                            <input type="text" id="edit-vocab-word" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-vocab-meaning">뜻 (한국어)</label>
+                            <input type="text" id="edit-vocab-meaning" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-vocab-example">예문 (영어)</label>
+                        <textarea id="edit-vocab-example" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-vocab-example-translation">예문 해석</label>
+                        <textarea id="edit-vocab-example-translation" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-vocab-context">학습 맥락 / 튜터</label>
+                            <input type="text" id="edit-vocab-context">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-vocab-pronunciation">한글 발음 / 강세 메모</label>
+                            <input type="text" id="edit-vocab-pronunciation">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-vocab-phonetic">사전 영어 발음 기호 (IPA)</label>
+                        <input type="text" id="edit-vocab-phonetic">
+                    </div>
+
+                    <div class="form-group">
+                        <label>태그 선택</label>
+                        <div class="tag-selector" id="edit-vocab-tags-container">
+                            <span class="tag-pill" data-value="Idiom">이디엄</span>
+                            <span class="tag-pill" data-value="Business">비즈니스</span>
+                            <span class="tag-pill" data-value="Casual">일상회화</span>
+                            <span class="tag-pill" data-value="Grammar">문법</span>
+                            <span class="tag-pill" data-value="Pronunciation">발음</span>
+                            <span class="tag-pill" data-value="Academic">학술</span>
+                            <span class="tag-pill" data-value="Other">기타</span>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-modal-btn">취소</button>
+                        <button type="submit" class="btn btn-primary">변경사항 저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Add Word From News Dialog -->
+    <div class="modal-backdrop" id="news-import-modal" style="display: none;">
+        <div class="modal-content glass-card modal-sm">
+            <div class="modal-header">
+                <h2>뉴스 단어 가져오기</h2>
+                <button class="btn-close-modal" id="close-import-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="news-import-form">
+                    <div class="form-group">
+                        <label for="import-word">단어 / 표현</label>
+                        <input type="text" id="import-word" readonly class="readonly-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="import-meaning">뜻 (한국어) <span class="required">*</span></label>
+                        <input type="text" id="import-meaning" placeholder="한국어 뜻을 입력하세요..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="import-example">문맥 예문 (영어 뉴스 문장)</label>
+                        <textarea id="import-example" rows="3" readonly class="readonly-input"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="import-translation">예문 한글 번역</label>
+                        <textarea id="import-translation" rows="2" readonly class="readonly-input"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="import-tags">태그</label>
+                        <select id="import-tags">
+                            <option value="News">뉴스 단어</option>
+                            <option value="Academic">학술</option>
+                            <option value="Business">비즈니스</option>
+                            <option value="Idiom">이디엄</option>
+                            <option value="Casual">일상회화</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-import-modal-btn">취소</button>
+                        <button type="submit" class="btn btn-primary">단어장에 추가</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- JavaScript Bundle -->
+    <script src="app.js"></script>
+</body>
+</html>
