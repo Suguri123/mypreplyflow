@@ -40,6 +40,13 @@
                         <div class="nav-ko">오늘의 뉴스</div>
                     </div>
                 </button>
+                <button class="nav-btn" data-target="translator">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h10M4 14h6M2 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"></path><path d="m14 11 4 4 4-4"></path></svg>
+                    <div class="nav-btn-label">
+                        <div class="nav-en">Translator</div>
+                        <div class="nav-ko">실시간 번역기</div>
+                    </div>
+                </button>
                 <button class="nav-btn" data-target="typing">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line><line x1="6" y1="12" x2="6.01" y2="12"></line><line x1="10" y1="12" x2="14.01" y2="12"></line><line x1="18" y1="12" x2="18.01" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
                     <div class="nav-btn-label">
@@ -531,6 +538,43 @@
                             <div class="result-actions">
                                 <button class="btn btn-secondary link-to-view" data-target="dashboard">대시보드로 이동</button>
                                 <button class="btn btn-primary" id="restart-flashcards-btn">추가 학습하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. TRANSLATOR VIEW -->
+                <section id="view-translator" class="view-pane" style="display: none;">
+                    <div class="translator-layout">
+                        <div class="translator-container glass-card">
+                            <div class="translator-header">
+                                <div class="lang-selector">
+                                    <span class="lang-pill active" id="lang-src-label" data-lang="en">영어 (English)</span>
+                                    <button class="btn-swap" id="btn-swap-lang" title="언어 방향 전환">⇄</button>
+                                    <span class="lang-pill" id="lang-tgt-label" data-lang="ko">한국어 (Korean)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="translator-body">
+                                <div class="translator-input-area">
+                                    <textarea id="src-text" placeholder="여기에 번역할 텍스트를 입력하세요 (자동 번역)..." rows="6"></textarea>
+                                    <div class="translator-actions">
+                                        <button class="btn-icon" id="btn-speak-src" title="텍스트 읽기 (TTS)">🔊</button>
+                                        <button class="btn-icon" id="btn-clear-src" title="내용 지우기" style="margin-left: 0.5rem;">🗑️</button>
+                                        <span class="char-counter" id="src-char-count" style="margin-left: auto; font-size: 0.8rem; opacity: 0.6;">0 / 1000</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="translator-output-area">
+                                    <div class="output-header">
+                                        <button class="btn btn-secondary btn-sm" id="btn-copy-tgt">복사</button>
+                                        <button class="btn btn-primary btn-sm" id="btn-add-translated-to-vocab">단어장 추가</button>
+                                    </div>
+                                    <div id="tgt-text" class="translation-output-text placeholder-active">번역 결과가 여기에 표시됩니다...</div>
+                                    <div class="translator-actions">
+                                        <button class="btn-icon" id="btn-speak-tgt" title="텍스트 읽기 (TTS)">🔊</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

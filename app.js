@@ -413,6 +413,11 @@ function switchView(viewId) {
             subEl.textContent = "3D 뒤집기 방식의 능동적 회상 복습으로 빠르게 어휘를 점검하세요.";
             resetFlashcardSession();
             break;
+        case "translator":
+            titleEl.textContent = "실시간 학습 번역기";
+            subEl.textContent = "수업 중에 모르는 문장을 바로 번역하고, 클릭 한 번으로 내 단어장에 추가해 보세요.";
+            initTranslator();
+            break;
     }
     
     // Close speech synthesis if navigating away from news/library/etc
@@ -1730,4 +1735,207 @@ function escapeHTML(str) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+// --- Live Translator Controller ---
+let isTranslatorInitialized = false;
+let translatorSourceLang = "en";
+let translatorTargetLang = "ko";
+let translationTimeout = null;
+
+function initTranslator() {
+    if (isTranslatorInitialized) return;
+    isTranslatorInitialized = true;
+    
+    const srcTextArea = document.getElementById("src-text");
+    const tgtTextDiv = document.getElementById("tgt-text");
+    const swapBtn = document.getElementById("btn-swap-lang");
+    const srcLabel = document.getElementById("lang-src-label");
+    const tgtLabel = document.getElementById("lang-tgt-label");
+    const speakSrcBtn = document.getElementById("btn-speak-src");
+    const speakTgtBtn = document.getElementById("btn-speak-tgt");
+    const clearSrcBtn = document.getElementById("btn-clear-src");
+    const charCountSpan = document.getElementById("src-char-count");
+    const copyTgtBtn = document.getElementById("btn-copy-tgt");
+    const addVocabBtn = document.getElementById("btn-add-translated-to-vocab");
+
+    // Clear initial state
+    srcTextArea.value = "";
+    tgtTextDiv.textContent = "번역 결과가 여기에 표시됩니다...";
+    tgtTextDiv.classList.add("placeholder-active");
+    charCountSpan.textContent = "0 / 1000";
+
+    srcTextArea.addEventListener("input", () => {
+        const text = srcTextArea.value;
+        if (text.length > 1000) {
+            srcTextArea.value = text.slice(0, 1000);
+        }
+        charCountSpan.textContent = `${srcTextArea.value.length} / 1000`;
+        
+        clearTimeout(translationTimeout);
+        if (!srcTextArea.value.trim()) {
+            tgtTextDiv.textContent = "번역 결과가 여기에 표시됩니다...";
+            tgtTextDiv.classList.add("placeholder-active");
+            return;
+        }
+        
+        tgtTextDiv.textContent = "입력 대기 중...";
+        tgtTextDiv.classList.add("placeholder-active");
+        translationTimeout = setTimeout(performTranslation, 600);
+    });
+
+    swapBtn.addEventListener("click", () => {
+        // Swap values
+        const tempLang = translatorSourceLang;
+        translatorSourceLang = translatorTargetLang;
+        translatorTargetLang = tempLang;
+
+        // Swap labels
+        if (translatorSourceLang === "en") {
+            srcLabel.textContent = "영어 (English)";
+            srcLabel.classList.add("active");
+            tgtLabel.textContent = "한국어 (Korean)";
+            tgtLabel.classList.remove("active");
+            srcTextArea.placeholder = "여기에 영어 텍스트를 입력하세요 (자동 번역)...";
+        } else {
+            srcLabel.textContent = "한국어 (Korean)";
+            srcLabel.classList.add("active");
+            tgtLabel.textContent = "영어 (English)";
+            tgtLabel.classList.remove("active");
+            srcTextArea.placeholder = "여기에 한글 텍스트를 입력하세요 (자동 번역)...";
+        }
+
+        // Swap contents
+        const srcText = srcTextArea.value;
+        const tgtText = tgtTextDiv.classList.contains("placeholder-active") ? "" : tgtTextDiv.textContent;
+
+        srcTextArea.value = tgtText;
+        charCountSpan.textContent = `${srcTextArea.value.length} / 1000`;
+
+        if (srcText) {
+            tgtTextDiv.textContent = srcText;
+            tgtTextDiv.classList.remove("placeholder-active");
+        } else {
+            tgtTextDiv.textContent = "번역 결과가 여기에 표시됩니다...";
+            tgtTextDiv.classList.add("placeholder-active");
+        }
+        
+        if (srcTextArea.value.trim()) {
+            performTranslation();
+        }
+    });
+
+    clearSrcBtn.addEventListener("click", () => {
+        srcTextArea.value = "";
+        tgtTextDiv.textContent = "번역 결과가 여기에 표시됩니다...";
+        tgtTextDiv.classList.add("placeholder-active");
+        charCountSpan.textContent = "0 / 1000";
+        window.speechSynthesis.cancel();
+    });
+
+    copyTgtBtn.addEventListener("click", () => {
+        const text = tgtTextDiv.textContent;
+        if (!text || tgtTextDiv.classList.contains("placeholder-active")) {
+            showToast("복사할 번역 결과가 없습니다.", "error");
+            return;
+        }
+        
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                showToast("번역 결과를 클립보드에 복사했습니다!", "success");
+            })
+            .catch(err => {
+                console.error("Copy failed:", err);
+                showToast("복사에 실패했습니다.", "error");
+            });
+    });
+
+    speakSrcBtn.addEventListener("click", () => {
+        const text = srcTextArea.value.trim();
+        if (!text) return;
+        
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = translatorSourceLang === "en" ? "en-US" : "ko-KR";
+        window.speechSynthesis.speak(utterance);
+    });
+
+    speakTgtBtn.addEventListener("click", () => {
+        const text = tgtTextDiv.textContent;
+        if (!text || tgtTextDiv.classList.contains("placeholder-active")) return;
+        
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = translatorTargetLang === "en" ? "en-US" : "ko-KR";
+        window.speechSynthesis.speak(utterance);
+    });
+
+    addVocabBtn.addEventListener("click", () => {
+        const srcText = srcTextArea.value.trim();
+        const tgtText = tgtTextDiv.classList.contains("placeholder-active") ? "" : tgtTextDiv.textContent.trim();
+        
+        if (!srcText || !tgtText) {
+            showToast("번역된 단어나 문장이 존재해야 단어장에 추가할 수 있습니다.", "error");
+            return;
+        }
+
+        // Determine which is English and which is Korean
+        let englishPhrase = "";
+        let koreanMeaning = "";
+
+        if (translatorSourceLang === "en") {
+            englishPhrase = srcText;
+            koreanMeaning = tgtText;
+        } else {
+            englishPhrase = tgtText;
+            koreanMeaning = srcText;
+        }
+
+        // Switch to add-word view
+        switchView("add-word");
+
+        // Prefill elements
+        document.getElementById("vocab-word").value = englishPhrase;
+        document.getElementById("vocab-meaning").value = koreanMeaning;
+        document.getElementById("vocab-context").value = "학습 번역기에서 연동";
+
+        // Show guide toast
+        showToast("번역된 어휘가 성공적으로 연동되었습니다. 🔍 자동 완성 버튼을 눌러보세요!", "success");
+
+        // Focus meaning
+        setTimeout(() => {
+            document.getElementById("vocab-meaning").focus();
+        }, 150);
+    });
+}
+
+async function performTranslation() {
+    const text = document.getElementById("src-text").value.trim();
+    const tgtTextDiv = document.getElementById("tgt-text");
+    if (!text) return;
+    
+    tgtTextDiv.textContent = "번역 중...";
+    tgtTextDiv.classList.add("placeholder-active");
+    
+    try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${translatorSourceLang}|${translatorTargetLang}`;
+        const res = await fetch(url);
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.responseData) {
+                let result = data.responseData.translatedText;
+                if (result && result.toLowerCase().includes("mymemory")) {
+                    tgtTextDiv.textContent = "번역 실패 (API 한도 초과 또는 오류)";
+                } else {
+                    tgtTextDiv.textContent = result;
+                    tgtTextDiv.classList.remove("placeholder-active");
+                }
+            }
+        } else {
+            tgtTextDiv.textContent = "번역 실패 (서버 연결 오류)";
+        }
+    } catch (err) {
+        console.error("Translation error:", err);
+        tgtTextDiv.textContent = "번역 오류가 발생했습니다.";
+    }
 }
