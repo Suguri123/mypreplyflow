@@ -517,6 +517,24 @@ function updateDashboardNewsPreview() {
 
 // --- Add Word Logger Controller ---
 // --- Add Word Logger Controller ---
+// --- Translation Utility ---
+async function translateTextGoogle(text, sourceLang = "en", targetLang = "ko") {
+    try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data[0]) {
+                const translated = data[0].map(x => x[0]).filter(Boolean).join('');
+                return translated;
+            }
+        }
+    } catch (e) {
+        console.error("Google Translate error:", e);
+    }
+    return "";
+}
+
 async function autoFetchVocabDetails(word) {
     let meaning = "";
     let example = "";
@@ -559,44 +577,12 @@ async function autoFetchVocabDetails(word) {
         console.warn("Dictionary API failed:", err);
     }
 
-    // 2. Fetch Korean translation of the word itself
-    try {
-        const transWordUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|ko`;
-        const transWordRes = await fetch(transWordUrl);
-        if (transWordRes.ok) {
-            const transWordData = await transWordRes.json();
-            if (transWordData && transWordData.responseData) {
-                meaning = transWordData.responseData.translatedText;
-                
-                // Clean up translation if it returns the fallback info
-                if (meaning && meaning.toLowerCase().includes("mymemory")) {
-                    meaning = "";
-                }
-            }
-        }
-    } catch (err) {
-        console.warn("Translation API failed for word:", err);
-    }
+    // 2. Fetch Korean translation of the word itself using Google Translate
+    meaning = await translateTextGoogle(word, "en", "ko");
 
     // 3. Translate example or generate fallback
     if (example) {
-        try {
-            const transExUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(example)}&langpair=en|ko`;
-            const transExRes = await fetch(transExUrl);
-            if (transExRes.ok) {
-                const transExData = await transExRes.json();
-                if (transExData && transExData.responseData) {
-                    translation = transExData.responseData.translatedText;
-                    
-                    // Clean up fallback info
-                    if (translation && translation.toLowerCase().includes("mymemory")) {
-                        translation = "";
-                    }
-                }
-            }
-        } catch (err) {
-            console.warn("Translation API failed for example:", err);
-        }
+        translation = await translateTextGoogle(example, "en", "ko");
     } else {
         // Fallback example in case API has no examples
         example = `He wanted to learn how to use the word "${word}" correctly.`;
@@ -1934,32 +1920,34 @@ async function performTranslation() {
     tgtTextDiv.classList.add("placeholder-active");
     
     try {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${translatorSourceLang}|${translatorTargetLang}`;
-        const res = await fetch(url);
-        if (res.ok) {
-            const data = await res.json();
-            if (data && data.responseData) {
-                let result = data.responseData.translatedText;
-                if (result && result.toLowerCase().includes("mymemory")) {
-                    tgtTextDiv.textContent = "번역 실패 (API 한도 초과 또는 오류)";
-                    altContainer.style.display = "none";
-                    dictDetailsDiv.style.display = "none";
-                } else {
-                    tgtTextDiv.textContent = result;
-                    tgtTextDiv.classList.remove("placeholder-active");
-                    
-                    // Show alternative translation choices
-                    showAlternativeTranslations(data.matches, result);
-                    
-                    // Show dictionary definitions and example sentences if it's a single word
-                    fetchDictionaryAlternatives(text);
-                }
-            }
-        } else {
+        // Translate using Google Translate for ultra-high accuracy
+        const result = await translateTextGoogle(text, translatorSourceLang, translatorTargetLang);
+        if (!result) {
             tgtTextDiv.textContent = "번역 실패 (서버 연결 오류)";
             altContainer.style.display = "none";
             dictDetailsDiv.style.display = "none";
+            return;
         }
+        
+        tgtTextDiv.textContent = result;
+        tgtTextDiv.classList.remove("placeholder-active");
+        
+        // Show alternative translations from MyMemory matches in the background
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${translatorSourceLang}|${translatorTargetLang}`;
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                showAlternativeTranslations(data.matches, result);
+            }
+        } catch (err) {
+            console.warn("MyMemory alternatives fetch failed:", err);
+            altContainer.style.display = "none";
+        }
+        
+        // Show dictionary definitions and example sentences if it's a single word
+        fetchDictionaryAlternatives(text);
+        
     } catch (err) {
         console.error("Translation error:", err);
         tgtTextDiv.textContent = "번역 오류가 발생했습니다.";
@@ -2035,28 +2023,13 @@ async function fetchDictionaryAlternatives(word) {
                         const defEn = d.definition;
                         const exEn = d.example || "";
                         
-                        // Translate definition
-                        let defKo = "";
-                        try {
-                            const transDefRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(defEn)}&langpair=en|ko`);
-                            if (transDefRes.ok) {
-                                const transDefData = await transDefRes.json();
-                                defKo = transDefData.responseData.translatedText;
-                                if (defKo && defKo.toLowerCase().includes("mymemory")) defKo = "";
-                            }
-                        } catch (e) { console.warn(e); }
+                        // Translate definition using Google Translate for perfect accuracy
+                        const defKo = await translateTextGoogle(defEn, "en", "ko");
                         
-                        // Translate example
+                        // Translate example using Google Translate
                         let exKo = "";
                         if (exEn) {
-                            try {
-                                const transExRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(exEn)}&langpair=en|ko`);
-                                if (transExRes.ok) {
-                                    const transExData = await transExRes.json();
-                                    exKo = transExData.responseData.translatedText;
-                                    if (exKo && exKo.toLowerCase().includes("mymemory")) exKo = "";
-                                }
-                            } catch (e) { console.warn(e); }
+                            exKo = await translateTextGoogle(exEn, "en", "ko");
                         }
                         
                         html += `
