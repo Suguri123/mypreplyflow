@@ -1744,10 +1744,15 @@ let translatorTargetLang = "ko";
 let translationTimeout = null;
 
 function initTranslator() {
+    const srcTextArea = document.getElementById("src-text");
+    if (!srcTextArea) {
+        isTranslatorInitialized = false;
+        return;
+    }
+    
     if (isTranslatorInitialized) return;
     isTranslatorInitialized = true;
     
-    const srcTextArea = document.getElementById("src-text");
     const tgtTextDiv = document.getElementById("tgt-text");
     const swapBtn = document.getElementById("btn-swap-lang");
     const srcLabel = document.getElementById("lang-src-label");
